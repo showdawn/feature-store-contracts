@@ -1,0 +1,140 @@
+{
+  "store": {
+    "manifests": {
+      "v1": {
+        "definition_version": "feature_def_v1",
+        "read_semantics": "bitemporal, knowledge cutoff = order_date",
+        "date_range": [
+          "2024-01-01",
+          "2024-12-31"
+        ],
+        "input_snapshot_recorded_at": "2026-01-20",
+        "rows": 150014
+      },
+      "v2": {
+        "definition_version": "feature_def_v1",
+        "read_semantics": "bitemporal, knowledge cutoff = order_date",
+        "date_range": [
+          "2024-07-01",
+          "2025-06-30"
+        ],
+        "input_snapshot_recorded_at": "2026-01-20",
+        "rows": 150061
+      },
+      "v3": {
+        "definition_version": "feature_def_v1",
+        "read_semantics": "bitemporal, knowledge cutoff = order_date",
+        "date_range": [
+          "2024-01-01",
+          "2025-12-31"
+        ],
+        "input_snapshot_recorded_at": "2026-01-20",
+        "rows": 300000
+      }
+    },
+    "models": {
+      "m1": {
+        "consumed": "v1",
+        "removal_method": null
+      },
+      "m2": {
+        "consumed": "v2",
+        "removal_method": null
+      },
+      "m3": {
+        "consumed": "v3",
+        "removal_method": "retrain from scratch on v3 re-materialised without the subject",
+        "removal_status": "recorded, not executed"
+      }
+    }
+  },
+  "report": {
+    "subject": 1781,
+    "hops": [
+      {
+        "artifact": "orders",
+        "reached": 32,
+        "unit": "rows",
+        "guarantee": "tracked",
+        "note": "base rows, deleted directly"
+      },
+      {
+        "artifact": "region_week_demand",
+        "reached": 32,
+        "unit": "aggregate cells",
+        "guarantee": "tracked",
+        "note": "relational aggregate, recomputed without the subject and checked cell by cell",
+        "check": {
+          "wrong_cells": 0,
+          "touched_cells": 32,
+          "removed_cells": 0,
+          "verified": true
+        }
+      },
+      {
+        "artifact": "dataset v1",
+        "reached": 17,
+        "unit": "rows",
+        "guarantee": "tracked",
+        "note": "manifest retained, re-materialised from inputs without the subject and checked row by row",
+        "check": {
+          "subject_rows_after": 0,
+          "other_rows_changed": 0,
+          "verified": true
+        }
+      },
+      {
+        "artifact": "dataset v2",
+        "reached": 18,
+        "unit": "rows",
+        "guarantee": "tracked",
+        "note": "manifest retained, re-materialised from inputs without the subject and checked row by row",
+        "check": {
+          "subject_rows_after": 0,
+          "other_rows_changed": 0,
+          "verified": true
+        }
+      },
+      {
+        "artifact": "dataset v3",
+        "reached": 32,
+        "unit": "rows",
+        "guarantee": "tracked",
+        "note": "manifest retained, re-materialised from inputs without the subject and checked row by row",
+        "check": {
+          "subject_rows_after": 0,
+          "other_rows_changed": 0,
+          "verified": true
+        }
+      },
+      {
+        "artifact": "model m1",
+        "reached": 1,
+        "unit": "model",
+        "guarantee": "consumed",
+        "note": "model consumed the dataset version, influence on predictions unknown"
+      },
+      {
+        "artifact": "model m2",
+        "reached": 1,
+        "unit": "model",
+        "guarantee": "consumed",
+        "note": "model consumed the dataset version, influence on predictions unknown"
+      },
+      {
+        "artifact": "model m3",
+        "reached": 1,
+        "unit": "model",
+        "guarantee": "recorded",
+        "note": "retrain from scratch on v3 re-materialised without the subject (recorded, not executed)"
+      },
+      {
+        "artifact": "exports outside the boundary",
+        "reached": null,
+        "unit": null,
+        "guarantee": "unknown",
+        "note": "standing line, the store holds no manifest for reads that bypassed the admission point"
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+item,rows,parquet_bytes,median_query_seconds
+capacity table,673.0,7884.0,
+capacity_current table,40.0,772.0,
+assignment table,58.0,1410.0,
+assignment_current table,24.0,598.0,
+orders table,300000.0,2833436.0,
+current snapshot join,,,0.1846
+current history read,,,1.1197
+valid history read,,,0.8343
+bitemporal history read,,,0.6334
