@@ -96,20 +96,31 @@ def run_read(con: duckdb.DuckDBPyConnection, sql: str) -> pd.DataFrame:
 
 def compare(read: pd.DataFrame, truth: pd.DataFrame,
             facilities: pd.DataFrame) -> dict[str, float]:
-    """Leakage and impossibility rates of one read against the ground truth."""
+    """Reconstruction disagreement with the as-known reference, null safely.
+
+    Disagreement is a value difference, not a count of future-information
+    predicates violated. Both absent values match; an absent value and a
+    present value differ, without reserving a numeric sentinel.
+    """
     m = read.merge(truth[["order_id", "facility_id", "capacity"]],
-                   on="order_id", suffixes=("", "_truth"))
+                   on="order_id", suffixes=("", "_truth"), how="outer",
+                   validate="one_to_one", indicator=True)
+    if not m["_merge"].eq("both").all():
+        raise ValueError("read and reference must contain the same order identifiers")
     m = m.merge(facilities, on="facility_id", how="left")
-    diff_fac = m["facility_id"] != m["facility_id_truth"]
-    diff_cap = m["capacity"].fillna(-1) != m["capacity_truth"].fillna(-1)
-    leaked = diff_fac | diff_cap
+    def differs(column: str) -> pd.Series:
+        actual, expected = m[column], m[column + "_truth"]
+        equal = actual.eq(expected).fillna(False) | (actual.isna() & expected.isna())
+        return ~equal
+
+    diff_fac = differs("facility_id")
+    diff_cap = differs("capacity")
+    disagreement = diff_fac | diff_cap
     impossible = pd.to_datetime(m["open_date"]) > pd.to_datetime(m["order_date"])
-    rel = ((m["capacity"] - m["capacity_truth"]).abs() / m["capacity_truth"]).fillna(0)
     return {
         "rows": int(len(m)),
-        "leakage_rate": float(leaked.mean()),
+        "disagreement_rate": float(disagreement.mean()),
         "facility_mismatch_rate": float(diff_fac.mean()),
         "impossible_rate": float(impossible.mean()),
-        "mean_abs_rel_error": float(rel.mean()),
         "missing_rate": float(m["capacity"].isna().mean()),
     }

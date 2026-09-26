@@ -1,0 +1,206 @@
+[
+  {
+    "contract_id": "capacity",
+    "contract_version": "capacity_v1",
+    "interpretation": "as_known",
+    "backend": "duckdb",
+    "backend_version": "1.4.5",
+    "cutoff": "order_date",
+    "valid_comparator": "<=",
+    "knowledge_cutoff": "order_date",
+    "sql_sha256": "d2d35dcdb58ac65d21b08a1789df4f322e2144ab07f932972ff636c0b3d8c746",
+    "sources": {
+      "orders": {
+        "source_id": "\"memory\".\"main\".\"orders\"",
+        "schema": [
+          [
+            "customer_id",
+            "BIGINT"
+          ],
+          [
+            "order_date",
+            "DATE"
+          ],
+          [
+            "order_id",
+            "BIGINT"
+          ],
+          [
+            "region_id",
+            "BIGINT"
+          ],
+          [
+            "units",
+            "BIGINT"
+          ]
+        ],
+        "row_count": 300000,
+        "sha256": "a7fab408a6480ca084fb52d24bb236301ba238d0fbb0d38ef91581432afa2dd5"
+      },
+      "assignment": {
+        "source_id": "\"memory\".\"main\".\"assignment\"",
+        "schema": [
+          [
+            "facility_id",
+            "BIGINT"
+          ],
+          [
+            "is_correction",
+            "BOOLEAN"
+          ],
+          [
+            "recorded_at",
+            "DATE"
+          ],
+          [
+            "region_id",
+            "BIGINT"
+          ],
+          [
+            "valid_from",
+            "DATE"
+          ]
+        ],
+        "row_count": 67,
+        "sha256": "af3ab5045d1aa17e407f70222355774124b34d84ec24b825b1e7c5cb3fde99fb"
+      },
+      "capacity": {
+        "source_id": "\"memory\".\"main\".\"capacity\"",
+        "schema": [
+          [
+            "capacity",
+            "DOUBLE"
+          ],
+          [
+            "facility_id",
+            "BIGINT"
+          ],
+          [
+            "is_correction",
+            "BOOLEAN"
+          ],
+          [
+            "recorded_at",
+            "DATE"
+          ],
+          [
+            "valid_from",
+            "DATE"
+          ]
+        ],
+        "row_count": 676,
+        "sha256": "d4511f1c840e1010f110d30fae33560f994b21b78b61f067f657bbb3967244b5"
+      }
+    },
+    "result_rows": 300000,
+    "fingerprint_encoding": "sha256(schema_json + newline + sorted row_json lines); all scalar values cast to DuckDB VARCHAR; NULL is JSON null",
+    "scope": "built-in capacity_v1; both joins generated; materialized source tables; one DuckDB transaction",
+    "limitations": [
+      "unsigned receipt in a trusted Python process",
+      "business-purpose interpretation is chosen by caller",
+      "direct SQL, modified code, external consumers and deletion actions are outside this boundary"
+    ]
+  },
+  {
+    "contract_id": "capacity",
+    "contract_version": "capacity_v1",
+    "interpretation": "corrected",
+    "backend": "duckdb",
+    "backend_version": "1.4.5",
+    "cutoff": "order_date",
+    "valid_comparator": "<=",
+    "knowledge_cutoff": "all_recorded_rows_in_input_snapshot",
+    "sql_sha256": "ea56af4c0e5b75d7c9e8d6449cbb014e0f515bb3b04c95a167825be0947096cd",
+    "sources": {
+      "orders": {
+        "source_id": "\"memory\".\"main\".\"orders\"",
+        "schema": [
+          [
+            "customer_id",
+            "BIGINT"
+          ],
+          [
+            "order_date",
+            "DATE"
+          ],
+          [
+            "order_id",
+            "BIGINT"
+          ],
+          [
+            "region_id",
+            "BIGINT"
+          ],
+          [
+            "units",
+            "BIGINT"
+          ]
+        ],
+        "row_count": 300000,
+        "sha256": "a7fab408a6480ca084fb52d24bb236301ba238d0fbb0d38ef91581432afa2dd5"
+      },
+      "assignment": {
+        "source_id": "\"memory\".\"main\".\"assignment\"",
+        "schema": [
+          [
+            "facility_id",
+            "BIGINT"
+          ],
+          [
+            "is_correction",
+            "BOOLEAN"
+          ],
+          [
+            "recorded_at",
+            "DATE"
+          ],
+          [
+            "region_id",
+            "BIGINT"
+          ],
+          [
+            "valid_from",
+            "DATE"
+          ]
+        ],
+        "row_count": 67,
+        "sha256": "af3ab5045d1aa17e407f70222355774124b34d84ec24b825b1e7c5cb3fde99fb"
+      },
+      "capacity": {
+        "source_id": "\"memory\".\"main\".\"capacity\"",
+        "schema": [
+          [
+            "capacity",
+            "DOUBLE"
+          ],
+          [
+            "facility_id",
+            "BIGINT"
+          ],
+          [
+            "is_correction",
+            "BOOLEAN"
+          ],
+          [
+            "recorded_at",
+            "DATE"
+          ],
+          [
+            "valid_from",
+            "DATE"
+          ]
+        ],
+        "row_count": 676,
+        "sha256": "d4511f1c840e1010f110d30fae33560f994b21b78b61f067f657bbb3967244b5"
+      }
+    },
+    "result_rows": 300000,
+    "fingerprint_encoding": "sha256(schema_json + newline + sorted row_json lines); all scalar values cast to DuckDB VARCHAR; NULL is JSON null",
+    "scope": "built-in capacity_v1; both joins generated; materialized source tables; one DuckDB transaction",
+    "limitations": [
+      "unsigned receipt in a trusted Python process",
+      "business-purpose interpretation is chosen by caller",
+      "direct SQL, modified code, external consumers and deletion actions are outside this boundary"
+    ]
+  }
+]

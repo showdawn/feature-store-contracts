@@ -1,4 +1,4 @@
-semantics,rows,leakage_rate,facility_mismatch_rate,impossible_rate,mean_abs_rel_error,missing_rate
-current,300000,0.9530433333333334,0.37738,0.17228666666666667,0.506495121525846,0.0
-valid,300000,0.13869,0.017566666666666668,0.0,0.026876024870081915,0.0
-bitemporal,300000,0.0,0.0,0.0,0.0,0.0
+semantics,rows,disagreement_rate,facility_mismatch_rate,impossible_rate,missing_rate
+current,300000,0.96096,0.47211333333333333,0.28511,0.0
+valid,300000,0.12029,0.021336666666666667,0.0,0.0
+bitemporal,300000,0.0,0.0,0.0,0.0

@@ -1,8 +1,9 @@
-"""A minimal admission check for training reads, and seven job variants.
+"""A declaration-only admission check and seven illustrative job variants.
 
-The check reads a job's declaration, never its SQL. That is the point of the
-paper's proposal and also its stated limit. A declaration that is missing a
-predicate, or that binds the knowledge cutoff to a constant instead of to each
+The check reads a job's declaration, never its SQL. This is the baseline's
+stated limit; governed.execute_contract is the closed execution path. A
+declaration that is missing a predicate, or that binds the knowledge cutoff
+to a constant instead of to each
 label's cutoff, is rejected. A declaration that is complete is admitted even
 if the SQL behind it has a boundary bug, and a declaration that names the
 wrong interpretation for the business question is admitted because the check
@@ -15,8 +16,9 @@ J3 and J6 bind the knowledge cutoff to the run date or to now. On this store
 every dimension row was recorded before any such date, so a predicate
 `recorded_at <= run_date` admits every row and the read is row for row the
 valid time read. Both variants therefore execute `reads.sql_for("valid")`,
-and the experiment reports the same leakage for J2, J3 and J6. The paper says
-so in the caption of Table 3.
+and the experiment reports the same reconstruction disagreement for J2, J3
+and J6. Corrected history is a legitimate choice; its suitability for a
+business question is not inferred here.
 """
 
 from __future__ import annotations
@@ -43,18 +45,39 @@ class JobDecl:
     sql: str
 
 
-def admission_check(job: JobDecl, required_interpretation: str = "as_known") -> tuple[str, str]:
+def admission_check(job: JobDecl) -> tuple[str, str]:
     """Return ('admitted' | 'rejected', reason).
 
-    `required_interpretation` is what the store's contract requires for a
-    read that reconstructs historical decisions. The check verifies that the
-    declaration is complete and internally consistent with its own
-    interpretation. It does not, and cannot, verify that the declared
-    interpretation is the one the business question needs. That comparison is
-    reported separately by the experiment as `interpretation_matches`.
+    This built-in capacity feature requires assignment and capacity exactly
+    once. Verify types, completeness and consistency with the declared
+    interpretation, without inspecting SQL or inferring business intent.
+    There is deliberately no unused "required interpretation" policy argument.
     """
+    if not isinstance(job, JobDecl):
+        return "rejected", "job must be a JobDecl"
+    if any(not isinstance(getattr(job, field), str)
+           for field in ("name", "description", "sql")):
+        return "rejected", "name, description and SQL must be strings"
+    if not isinstance(job.interpretation, str):
+        return "rejected", "temporal interpretation must be a string"
     if job.interpretation == "none":
         return "rejected", "no temporal interpretation declared"
+    if job.interpretation not in ("as_known", "corrected"):
+        return "rejected", "unknown temporal interpretation"
+    if not isinstance(job.joins, tuple) or not job.joins:
+        return "rejected", "joins must be a nonempty tuple"
+    for j in job.joins:
+        if not isinstance(j, JoinDecl):
+            return "rejected", "each join must be a JoinDecl"
+        if not isinstance(j.dimension, str) or j.dimension not in ("assignment", "capacity"):
+            return "rejected", "unknown join dependency"
+        if type(j.valid_time_predicate) is not bool or type(j.knowledge_time_predicate) is not bool:
+            return "rejected", f"{j.dimension} predicate flags must be booleans"
+        if not isinstance(j.knowledge_cutoff, str) or j.knowledge_cutoff not in ("label", "job_run", "now", "none"):
+            return "rejected", f"{j.dimension} join has an invalid knowledge cutoff"
+    dimensions = [j.dimension for j in job.joins]
+    if sorted(dimensions) != ["assignment", "capacity"]:
+        return "rejected", "assignment and capacity joins must each appear exactly once"
     for j in job.joins:
         if not j.valid_time_predicate:
             return "rejected", f"{j.dimension} join has no valid time predicate"

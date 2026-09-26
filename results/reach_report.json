@@ -2,68 +2,192 @@
   "store": {
     "manifests": {
       "v1": {
-        "definition_version": "feature_def_v1",
-        "read_semantics": "bitemporal, knowledge cutoff = order_date",
+        "definition_version": "capacity_and_previous_week_region_demand_v2",
+        "definition_sha256": "ab71fd590c234404da106fbc0bee08c7b37781ee240021e8dd8e6d27fafa1cab",
+        "read_semantics": "bitemporal capacity; knowledge cutoff = order_date; previous complete week demand",
+        "order_availability_assumption": "orders known on order_date; no late or corrected orders",
         "date_range": [
           "2024-01-01",
           "2024-12-31"
         ],
-        "input_snapshot_recorded_at": "2026-01-20",
-        "rows": 150014
+        "input_fingerprints": {
+          "orders": {
+            "algorithm": "duckdb-json-row-multiset-sha256-v1",
+            "rows": 300000,
+            "sha256": "056e03a2ebdf07dd8722bb81af989b09aad1cb7211d3e09ef0894aef7ebaf9aa"
+          },
+          "assignment": {
+            "algorithm": "duckdb-json-row-multiset-sha256-v1",
+            "rows": 67,
+            "sha256": "382fffa7f12a65f9879a55d4cea3b30436f3511a623a4dbf31aaa1e8aaf75c69"
+          },
+          "capacity": {
+            "algorithm": "duckdb-json-row-multiset-sha256-v1",
+            "rows": 676,
+            "sha256": "1932653030377dc0a4d57fe8482e9ce2b9b42d00e7d02243e0587f43185882ac"
+          }
+        },
+        "consumed_derived_artifacts": [
+          "region_week_demand"
+        ],
+        "rows": 150492
       },
       "v2": {
-        "definition_version": "feature_def_v1",
-        "read_semantics": "bitemporal, knowledge cutoff = order_date",
+        "definition_version": "capacity_and_previous_week_region_demand_v2",
+        "definition_sha256": "ab71fd590c234404da106fbc0bee08c7b37781ee240021e8dd8e6d27fafa1cab",
+        "read_semantics": "bitemporal capacity; knowledge cutoff = order_date; previous complete week demand",
+        "order_availability_assumption": "orders known on order_date; no late or corrected orders",
         "date_range": [
           "2024-07-01",
           "2025-06-30"
         ],
-        "input_snapshot_recorded_at": "2026-01-20",
-        "rows": 150061
+        "input_fingerprints": {
+          "orders": {
+            "algorithm": "duckdb-json-row-multiset-sha256-v1",
+            "rows": 300000,
+            "sha256": "056e03a2ebdf07dd8722bb81af989b09aad1cb7211d3e09ef0894aef7ebaf9aa"
+          },
+          "assignment": {
+            "algorithm": "duckdb-json-row-multiset-sha256-v1",
+            "rows": 67,
+            "sha256": "382fffa7f12a65f9879a55d4cea3b30436f3511a623a4dbf31aaa1e8aaf75c69"
+          },
+          "capacity": {
+            "algorithm": "duckdb-json-row-multiset-sha256-v1",
+            "rows": 676,
+            "sha256": "1932653030377dc0a4d57fe8482e9ce2b9b42d00e7d02243e0587f43185882ac"
+          }
+        },
+        "consumed_derived_artifacts": [
+          "region_week_demand"
+        ],
+        "rows": 150174
       },
       "v3": {
-        "definition_version": "feature_def_v1",
-        "read_semantics": "bitemporal, knowledge cutoff = order_date",
+        "definition_version": "capacity_and_previous_week_region_demand_v2",
+        "definition_sha256": "ab71fd590c234404da106fbc0bee08c7b37781ee240021e8dd8e6d27fafa1cab",
+        "read_semantics": "bitemporal capacity; knowledge cutoff = order_date; previous complete week demand",
+        "order_availability_assumption": "orders known on order_date; no late or corrected orders",
         "date_range": [
           "2024-01-01",
           "2025-12-31"
         ],
-        "input_snapshot_recorded_at": "2026-01-20",
+        "input_fingerprints": {
+          "orders": {
+            "algorithm": "duckdb-json-row-multiset-sha256-v1",
+            "rows": 300000,
+            "sha256": "056e03a2ebdf07dd8722bb81af989b09aad1cb7211d3e09ef0894aef7ebaf9aa"
+          },
+          "assignment": {
+            "algorithm": "duckdb-json-row-multiset-sha256-v1",
+            "rows": 67,
+            "sha256": "382fffa7f12a65f9879a55d4cea3b30436f3511a623a4dbf31aaa1e8aaf75c69"
+          },
+          "capacity": {
+            "algorithm": "duckdb-json-row-multiset-sha256-v1",
+            "rows": 676,
+            "sha256": "1932653030377dc0a4d57fe8482e9ce2b9b42d00e7d02243e0587f43185882ac"
+          }
+        },
+        "consumed_derived_artifacts": [
+          "region_week_demand"
+        ],
         "rows": 300000
       }
     },
     "models": {
       "m1": {
         "consumed": "v1",
-        "removal_method": null
+        "removal_method": null,
+        "consumption_evidence": "declared fixture association; no model trained"
       },
       "m2": {
         "consumed": "v2",
-        "removal_method": null
+        "removal_method": null,
+        "consumption_evidence": "declared fixture association; no model trained"
       },
       "m3": {
         "consumed": "v3",
-        "removal_method": "retrain from scratch on v3 re-materialised without the subject",
-        "removal_status": "recorded, not executed"
+        "removal_method": "retrain from scratch on the subject-free recomputed v3",
+        "removal_status": "recorded, not executed",
+        "consumption_evidence": "declared fixture association; no model trained"
+      }
+    },
+    "retained_fingerprints": {
+      "orders": {
+        "algorithm": "duckdb-json-row-multiset-sha256-v1",
+        "rows": 300000,
+        "sha256": "056e03a2ebdf07dd8722bb81af989b09aad1cb7211d3e09ef0894aef7ebaf9aa"
+      },
+      "assignment": {
+        "algorithm": "duckdb-json-row-multiset-sha256-v1",
+        "rows": 67,
+        "sha256": "382fffa7f12a65f9879a55d4cea3b30436f3511a623a4dbf31aaa1e8aaf75c69"
+      },
+      "capacity": {
+        "algorithm": "duckdb-json-row-multiset-sha256-v1",
+        "rows": 676,
+        "sha256": "1932653030377dc0a4d57fe8482e9ce2b9b42d00e7d02243e0587f43185882ac"
+      },
+      "region_week_demand": {
+        "algorithm": "duckdb-json-row-multiset-sha256-v1",
+        "rows": 2520,
+        "sha256": "413a43546e0e12949ff3d0e20c6db61803efaf18edc43e25fef2880d121d6109"
+      },
+      "training_read": {
+        "algorithm": "duckdb-json-row-multiset-sha256-v1",
+        "rows": 300000,
+        "sha256": "eea81da51a939712ec8afeedf6cb3fcc6c93cf3f3cd077f68a4d6f4d73eeebc0"
+      },
+      "dataset_v1": {
+        "algorithm": "duckdb-json-row-multiset-sha256-v1",
+        "rows": 150492,
+        "sha256": "3684783c46a0bcad0c02bad2cf672ceb0fda63d50ee233297c9d22c1091ff9ba"
+      },
+      "dataset_v2": {
+        "algorithm": "duckdb-json-row-multiset-sha256-v1",
+        "rows": 150174,
+        "sha256": "57d61e1e05f20e03f035927ab4e59fdeac43bca319510598c41fc4a4db5afea5"
+      },
+      "dataset_v3": {
+        "algorithm": "duckdb-json-row-multiset-sha256-v1",
+        "rows": 300000,
+        "sha256": "eea81da51a939712ec8afeedf6cb3fcc6c93cf3f3cd077f68a4d6f4d73eeebc0"
       }
     }
   },
   "report": {
-    "subject": 1781,
+    "subject": 10751,
+    "mode": "hypothetical_recomputation",
+    "retained_originals_unchanged": true,
+    "scope": "Retained relational artifacts only; declared model associations; bypass exports unknown.",
     "hops": [
       {
         "artifact": "orders",
         "reached": 32,
         "unit": "rows",
-        "guarantee": "tracked",
-        "note": "base rows, deleted directly"
+        "note": "Subject omitted only from scratch input; retained base rows remain unchanged.",
+        "lineage": "tracked_base_rows",
+        "consumption": "not_applicable",
+        "action": "hypothetical_filter",
+        "verification": "passed",
+        "removal_certification": "none",
+        "check": {
+          "subject_rows_after": 0,
+          "other_rows_changed": 0,
+          "verified": true
+        }
       },
       {
         "artifact": "region_week_demand",
         "reached": 32,
         "unit": "aggregate cells",
-        "guarantee": "tracked",
-        "note": "relational aggregate, recomputed without the subject and checked cell by cell",
+        "note": "Recomputed from scratch orders; retained-minus-subject deltas checked cell by cell.",
+        "lineage": "tracked_relational",
+        "consumption": "input_dependencies_recorded",
+        "action": "hypothetical_recomputation",
+        "verification": "passed",
+        "removal_certification": "none",
         "check": {
           "wrong_cells": 0,
           "touched_cells": 32,
@@ -73,67 +197,116 @@
       },
       {
         "artifact": "dataset v1",
-        "reached": 17,
+        "reached": 1591,
         "unit": "rows",
-        "guarantee": "tracked",
-        "note": "manifest retained, re-materialised from inputs without the subject and checked row by row",
+        "note": "Recomputed from scratch orders, temporal dimensions and shared aggregate; retained originals unchanged.",
+        "lineage": "tracked_relational",
+        "consumption": "input_dependencies_recorded",
+        "action": "hypothetical_recomputation",
+        "verification": "passed",
+        "removal_certification": "none",
+        "direct_rows": 14,
+        "indirect_rows": 1577,
         "check": {
           "subject_rows_after": 0,
-          "other_rows_changed": 0,
+          "missing_or_extra_rows": 0,
+          "row_local_values_changed": 0,
+          "incorrect_shared_values": 0,
+          "other_rows_changed": 1577,
+          "unaffected_rows_changed": 0,
           "verified": true
         }
       },
       {
         "artifact": "dataset v2",
-        "reached": 18,
+        "reached": 2050,
         "unit": "rows",
-        "guarantee": "tracked",
-        "note": "manifest retained, re-materialised from inputs without the subject and checked row by row",
+        "note": "Recomputed from scratch orders, temporal dimensions and shared aggregate; retained originals unchanged.",
+        "lineage": "tracked_relational",
+        "consumption": "input_dependencies_recorded",
+        "action": "hypothetical_recomputation",
+        "verification": "passed",
+        "removal_certification": "none",
+        "direct_rows": 17,
+        "indirect_rows": 2033,
         "check": {
           "subject_rows_after": 0,
-          "other_rows_changed": 0,
+          "missing_or_extra_rows": 0,
+          "row_local_values_changed": 0,
+          "incorrect_shared_values": 0,
+          "other_rows_changed": 2033,
+          "unaffected_rows_changed": 0,
           "verified": true
         }
       },
       {
         "artifact": "dataset v3",
-        "reached": 32,
+        "reached": 3757,
         "unit": "rows",
-        "guarantee": "tracked",
-        "note": "manifest retained, re-materialised from inputs without the subject and checked row by row",
+        "note": "Recomputed from scratch orders, temporal dimensions and shared aggregate; retained originals unchanged.",
+        "lineage": "tracked_relational",
+        "consumption": "input_dependencies_recorded",
+        "action": "hypothetical_recomputation",
+        "verification": "passed",
+        "removal_certification": "none",
+        "direct_rows": 32,
+        "indirect_rows": 3725,
         "check": {
           "subject_rows_after": 0,
-          "other_rows_changed": 0,
+          "missing_or_extra_rows": 0,
+          "row_local_values_changed": 0,
+          "incorrect_shared_values": 0,
+          "other_rows_changed": 3725,
+          "unaffected_rows_changed": 0,
           "verified": true
         }
       },
       {
         "artifact": "model m1",
         "reached": 1,
-        "unit": "model",
-        "guarantee": "consumed",
-        "note": "model consumed the dataset version, influence on predictions unknown"
+        "unit": "model identifier",
+        "note": "Declared dataset association only; no model trained. Influence and removal unknown.",
+        "lineage": "dataset_dependency_recorded",
+        "consumption": "declared_fixture_association",
+        "action": "none",
+        "verification": "not_performed",
+        "removal_certification": "none",
+        "consumed_version": "v1"
       },
       {
         "artifact": "model m2",
         "reached": 1,
-        "unit": "model",
-        "guarantee": "consumed",
-        "note": "model consumed the dataset version, influence on predictions unknown"
+        "unit": "model identifier",
+        "note": "Declared dataset association only; no model trained. Influence and removal unknown.",
+        "lineage": "dataset_dependency_recorded",
+        "consumption": "declared_fixture_association",
+        "action": "none",
+        "verification": "not_performed",
+        "removal_certification": "none",
+        "consumed_version": "v2"
       },
       {
         "artifact": "model m3",
         "reached": 1,
-        "unit": "model",
-        "guarantee": "recorded",
-        "note": "retrain from scratch on v3 re-materialised without the subject (recorded, not executed)"
+        "unit": "model identifier",
+        "note": "Declared dataset association only; no model trained. Influence and removal unknown. Recorded method: retrain from scratch on the subject-free recomputed v3 (not executed).",
+        "lineage": "dataset_dependency_recorded",
+        "consumption": "declared_fixture_association",
+        "action": "method_recorded_not_executed",
+        "verification": "not_performed",
+        "removal_certification": "none",
+        "consumed_version": "v3"
       },
       {
         "artifact": "exports outside the boundary",
         "reached": null,
-        "unit": null,
-        "guarantee": "unknown",
-        "note": "standing line, the store holds no manifest for reads that bypassed the admission point"
+        "unit": "unknown",
+        "note": "Bypassing exports have no manifests; scope and removal are unknown.",
+        "lineage": "unknown",
+        "consumption": "unknown",
+        "action": "unknown",
+        "verification": "unknown",
+        "removal_certification": "unknown"
       }
     ]
   }

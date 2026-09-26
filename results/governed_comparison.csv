@@ -1,0 +1,8 @@
+variant,analogous_api_request,request_parameters,executed,interpretation_matches_question,disagreement_rate,outcome
+J1 current value,request a current-value interpretation,"{""interpretation"": ""current""}",False,,,"ValueError: unsupported interpretation: 'current'; supported: ('as_known', 'corrected')"
+J2 valid time only,request omission of knowledge predicates,"{""knowledge_time_predicate"": false}",False,,,TypeError: execute_contract() got an unexpected keyword argument 'knowledge_time_predicate'
+J3 knowledge bound to run date,request one job-run cutoff,"{""cutoff"": ""job_run""}",False,,,"ValueError: unsupported cutoff: 'job_run'; supported: ('order_date',)"
+J4 boundary bug,request an exclusive valid-time boundary,"{""valid_op"": ""<""}",False,,,TypeError: execute_contract() got an unexpected keyword argument 'valid_op'
+J5 bitemporal,request built-in as-known history,"{""interpretation"": ""as_known""}",True,True,0.0,executed built-in as_known contract
+J6 corrected history declared,request built-in corrected history,"{""interpretation"": ""corrected""}",True,False,0.12029,executed built-in corrected contract
+J7 one join fixed,request a current-value assignment join,"{""assignment_semantics"": ""current""}",False,,,TypeError: execute_contract() got an unexpected keyword argument 'assignment_semantics'

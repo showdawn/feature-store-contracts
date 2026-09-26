@@ -1,0 +1,65 @@
+{
+  "os": "Darwin",
+  "os_release": "27.0.0",
+  "os_version": "27.0",
+  "architecture": "arm64",
+  "cpu_model": "Apple M5 Pro",
+  "logical_cpus": 18,
+  "ram_bytes": 51539607552,
+  "duckdb_threads": 4,
+  "versions": {
+    "duckdb": "1.4.5",
+    "pandas": "2.3.3",
+    "numpy": "2.0.2",
+    "matplotlib": "3.9.4",
+    "tabulate": "0.9.0",
+    "python": "3.9.6",
+    "python_implementation": "CPython"
+  },
+  "quick": false,
+  "main_parameters": {
+    "seed": 7,
+    "start": "2024-01-01",
+    "days": 730,
+    "n_regions": 24,
+    "n_facilities_initial": 30,
+    "n_facilities_opened_later": 10,
+    "n_orders": 300000,
+    "mean_days_between_capacity_changes": 45.0,
+    "short_lag_share": 0.2,
+    "late_arrival_share": 0.1,
+    "correction_share": 0.15,
+    "correction_lag_days": [
+      5,
+      30
+    ],
+    "late_lag_days": [
+      7,
+      60
+    ]
+  },
+  "sweep_seeds": [
+    7,
+    11,
+    19,
+    23,
+    31
+  ],
+  "sweep_orders_per_seed": 100000,
+  "controlled_world": "independent streams for facilities, capacity, assignment, orders, and overlays; potential correction values and lags drawn for all rows before selection",
+  "timing_protocol": "cost: one warm-up then five timed runs per query on the same connection; each sample includes execute and fetchall; other stage times include result fetch",
+  "stage_seconds": {
+    "main generation": 0.044265,
+    "main loading": 0.021827,
+    "main reads": 0.690246,
+    "no-lag control": 0.509856,
+    "late-arrival sweep": 10.629507,
+    "correction sweep": 11.183354,
+    "declaration admission": 1.603903,
+    "closed contract API": 1.649435,
+    "storage and timing": 4.680344,
+    "retained datasets": 0.781019,
+    "hypothetical deletion recomputation": 1.498425
+  },
+  "experiment_seconds": 33.460523
+}

@@ -1,0 +1,21 @@
+query,repetition,seconds_including_fetch
+current snapshot join,1,0.08197658300000299
+current snapshot join,2,0.07756045800000066
+current snapshot join,3,0.07863329099999916
+current snapshot join,4,0.07748970900000174
+current snapshot join,5,0.07648929100000146
+current history read,1,0.27979533299999915
+current history read,2,0.2789250420000009
+current history read,3,0.2785205409999989
+current history read,4,0.2758581249999992
+current history read,5,0.27826679200000015
+valid history read,1,0.22472150000000113
+valid history read,2,0.2290595830000015
+valid history read,3,0.22491179100000025
+valid history read,4,0.22656499999999724
+valid history read,5,0.22565725000000114
+bitemporal history read,1,0.19568333299999807
+bitemporal history read,2,0.19615941600000042
+bitemporal history read,3,0.19550724999999858
+bitemporal history read,4,0.19625479199999774
+bitemporal history read,5,0.19607095799999996

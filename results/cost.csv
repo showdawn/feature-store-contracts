@@ -1,10 +1,10 @@
-item,rows,parquet_bytes,median_query_seconds
-capacity table,673.0,7884.0,
-capacity_current table,40.0,772.0,
-assignment table,58.0,1410.0,
-assignment_current table,24.0,598.0,
-orders table,300000.0,2833436.0,
-current snapshot join,,,0.1846
-current history read,,,1.1197
-valid history read,,,0.8343
-bitemporal history read,,,0.6334
+item,rows,parquet_bytes,median_query_seconds,min_query_seconds,max_query_seconds
+capacity table,676.0,7960.0,,,
+capacity_current table,40.0,727.0,,,
+assignment table,67.0,1439.0,,,
+assignment_current table,24.0,556.0,,,
+orders table,300000.0,2831594.0,,,
+current snapshot join,,,0.07756,0.076489,0.081977
+current history read,,,0.278521,0.275858,0.279795
+valid history read,,,0.225657,0.224722,0.22906
+bitemporal history read,,,0.196071,0.195507,0.196255

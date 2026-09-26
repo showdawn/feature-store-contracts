@@ -1,8 +1,8 @@
-variant,description,interpretation_declared,admission,reason,interpretation_matches_question,leakage_rate_if_run,impossible_rate_if_run
-J1 current value,Join the current dimension rows. The incident in Section 1.,none,rejected,no temporal interpretation declared,False,0.9530433333333334,0.17228666666666667
-J2 valid time only,As of join on valid_from. Ignores when the store learned the fact.,as_known,rejected,assignment join has no knowledge time predicate,True,0.13869,0.0
-J3 knowledge bound to run date,"Both clocks, but recorded_at is compared to the job's run date for every row.",as_known,rejected,assignment join binds the knowledge cutoff to 'job_run' instead of each label's cutoff,True,0.13869,0.0
-J4 boundary bug,"Correct declaration, but the SQL uses < instead of <= on valid_from.",as_known,admitted,declaration complete and consistent,True,0.01855,0.0
+variant,description,interpretation_declared,admission,reason,interpretation_matches_question,disagreement_rate_if_run,impossible_rate_if_run
+J1 current value,Join the current dimension rows. The incident in Section 1.,none,rejected,no temporal interpretation declared,False,0.96096,0.28511
+J2 valid time only,As of join on valid_from. Ignores when the store learned the fact.,as_known,rejected,assignment join has no knowledge time predicate,True,0.12029,0.0
+J3 knowledge bound to run date,"Both clocks, but recorded_at is compared to the job's run date for every row.",as_known,rejected,assignment join binds the knowledge cutoff to 'job_run' instead of each label's cutoff,True,0.12029,0.0
+J4 boundary bug,"Correct declaration, but the SQL uses < instead of <= on valid_from.",as_known,admitted,declaration complete and consistent,True,0.01858,0.0
 J5 bitemporal,Both clocks bound to each order's date. The contract's intended read.,as_known,admitted,declaration complete and consistent,True,0.0,0.0
-J6 corrected history declared,"Declares the corrected history interpretation, consistently, for a question that needs the as known interpretation.",corrected,admitted,declaration complete and consistent,False,0.13869,0.0
-J7 one join fixed,"Bitemporal on capacity, current value on the region assignment.",as_known,rejected,assignment join has no valid time predicate,True,0.37738,0.17228666666666667
+J6 corrected history declared,"Declares the corrected history interpretation, consistently, for a question that needs the as known interpretation.",corrected,admitted,declaration complete and consistent,False,0.12029,0.0
+J7 one join fixed,"Bitemporal on capacity, current value on the region assignment.",as_known,rejected,assignment join has no valid time predicate,True,0.47211333333333333,0.28511

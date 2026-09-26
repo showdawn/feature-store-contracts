@@ -48,8 +48,9 @@ class Params:
     late_lag_days: tuple[int, int] = (7, 60)
 
 
-def _rng(p: Params) -> np.random.Generator:
-    return np.random.default_rng(p.seed)
+def _rng(p: Params, stream: int) -> np.random.Generator:
+    """Named, independent streams keep overlay parameters out of the base world."""
+    return np.random.default_rng(np.random.SeedSequence([p.seed, stream]))
 
 
 def _recording_lag(rng: np.random.Generator, n: int, p: Params) -> np.ndarray:
@@ -57,10 +58,14 @@ def _recording_lag(rng: np.random.Generator, n: int, p: Params) -> np.ndarray:
     u = rng.random(n)
     lag = np.zeros(n, dtype=int)
     short = (u >= 1.0 - p.late_arrival_share - p.short_lag_share) & (u < 1.0 - p.late_arrival_share)
-    lag[short] = rng.integers(1, 4, size=short.sum())
+    # Draw a potential lag for every row before selection. Changing a share
+    # must not move the random draw associated with a different row.
+    short_days = rng.integers(1, 4, size=n)
+    lag[short] = short_days[short]
     late = u >= 1.0 - p.late_arrival_share
     lo, hi = p.late_lag_days
-    lag[late] = rng.integers(lo, hi + 1, size=late.sum())
+    late_days = rng.integers(lo, hi + 1, size=n)
+    lag[late] = late_days[late]
     return lag
 
 
@@ -72,11 +77,13 @@ def _add_corrections(rows: pd.DataFrame, rng: np.random.Generator, p: Params,
     """
     n = len(rows)
     pick = rng.random(n) < p.correction_share
-    corr = rows[pick].copy()
     lo, hi = p.correction_lag_days
+    correction_days = rng.integers(lo, hi + 1, size=n)
+    corrected_values = jitter(rows[value_col].to_numpy(), rng)
+    corr = rows[pick].copy()
     corr["recorded_at"] = corr["recorded_at"] + pd.to_timedelta(
-        rng.integers(lo, hi + 1, size=len(corr)), unit="D")
-    corr[value_col] = jitter(corr[value_col].to_numpy(), rng)
+        correction_days[pick], unit="D")
+    corr[value_col] = corrected_values[pick]
     corr["is_correction"] = True
     rows = rows.copy()
     rows["is_correction"] = False
@@ -85,7 +92,10 @@ def _add_corrections(rows: pd.DataFrame, rng: np.random.Generator, p: Params,
 
 
 def generate(p: Params) -> dict[str, pd.DataFrame]:
-    rng = _rng(p)
+    # The four base-world streams and four overlay streams are fixed. Neither
+    # lag shares nor correction shares can perturb facilities, values,
+    # assignments, orders, or the potential corrections to other rows.
+    facility_rng, capacity_rng, assignment_rng, order_rng = [_rng(p, i) for i in range(4)]
     start = pd.Timestamp(p.start)
     end = start + pd.Timedelta(days=p.days - 1)
 
@@ -93,7 +103,7 @@ def generate(p: Params) -> dict[str, pd.DataFrame]:
     n_fac = p.n_facilities_initial + p.n_facilities_opened_later
     open_offsets = np.concatenate([
         np.zeros(p.n_facilities_initial, dtype=int),
-        rng.integers(90, p.days - 120, size=p.n_facilities_opened_later),
+        facility_rng.integers(90, p.days - 120, size=p.n_facilities_opened_later),
     ])
     facilities = pd.DataFrame({
         "facility_id": np.arange(n_fac),
@@ -104,23 +114,23 @@ def generate(p: Params) -> dict[str, pd.DataFrame]:
     cap_rows = []
     for fid, open_date in zip(facilities.facility_id, facilities.open_date):
         day = open_date
-        value = float(rng.integers(800, 4000))
+        value = float(capacity_rng.integers(800, 4000))
         cap_rows.append((fid, day, value))
         while True:
-            gap = int(rng.exponential(p.mean_days_between_capacity_changes)) + 1
+            gap = int(capacity_rng.exponential(p.mean_days_between_capacity_changes)) + 1
             day = day + pd.Timedelta(days=gap)
             if day > end:
                 break
-            value = max(200.0, value * float(rng.normal(1.0, 0.15)))
+            value = max(200.0, value * float(capacity_rng.normal(1.0, 0.15)))
             cap_rows.append((fid, day, round(value)))
     cap = pd.DataFrame(cap_rows, columns=["key", "valid_from", "capacity"])
     cap["recorded_at"] = cap["valid_from"] + pd.to_timedelta(
-        _recording_lag(rng, len(cap), p), unit="D")
+        _recording_lag(_rng(p, 4), len(cap), p), unit="D")
     # The opening row of a facility is known on the day it opens.
     first = cap.groupby("key")["valid_from"].transform("min") == cap["valid_from"]
     cap.loc[first, "recorded_at"] = cap.loc[first, "valid_from"]
     cap = _add_corrections(
-        cap, rng, p, "capacity",
+        cap, _rng(p, 5), p, "capacity",
         jitter=lambda v, r: np.round(v * r.normal(1.0, 0.10, size=len(v))))
     cap = cap.rename(columns={"key": "facility_id"})
 
@@ -131,38 +141,38 @@ def generate(p: Params) -> dict[str, pd.DataFrame]:
     assign_rows = []
     initial_fac = facilities[facilities.open_date == start].facility_id.to_numpy()
     for rid in range(p.n_regions):
-        assign_rows.append((rid, start, int(rng.choice(initial_fac))))
+        assign_rows.append((rid, start, int(assignment_rng.choice(initial_fac))))
     later = facilities[facilities.open_date > start]
     regions = np.arange(p.n_regions)
     for fid, open_date in zip(later.facility_id, later.open_date):
-        for rid in rng.choice(regions, size=int(rng.integers(1, 3)), replace=False):
+        for rid in assignment_rng.choice(regions, size=int(assignment_rng.integers(1, 3)), replace=False):
             assign_rows.append((int(rid), open_date, int(fid)))
     # Occasional reassignments between existing facilities.
     for _ in range(p.n_regions // 2):
-        rid = int(rng.integers(0, p.n_regions))
-        day = start + pd.Timedelta(days=int(rng.integers(30, p.days - 30)))
+        rid = int(assignment_rng.integers(0, p.n_regions))
+        day = start + pd.Timedelta(days=int(assignment_rng.integers(30, p.days - 30)))
         cands = facilities[facilities.open_date <= day].facility_id.to_numpy()
-        assign_rows.append((rid, day, int(rng.choice(cands))))
+        assign_rows.append((rid, day, int(assignment_rng.choice(cands))))
     asg = pd.DataFrame(assign_rows, columns=["key", "valid_from", "facility_id"])
     asg = asg.drop_duplicates(["key", "valid_from"], keep="last")
     asg["recorded_at"] = asg["valid_from"] + pd.to_timedelta(
-        _recording_lag(rng, len(asg), p), unit="D")
+        _recording_lag(_rng(p, 6), len(asg), p), unit="D")
     first = asg["valid_from"] == start
     asg.loc[first, "recorded_at"] = start
     asg = _add_corrections(
-        asg, rng, p, "facility_id",
+        asg, _rng(p, 7), p, "facility_id",
         jitter=lambda v, r: r.choice(initial_fac, size=len(v)))
     asg = asg.rename(columns={"key": "region_id"})
 
     # Orders. Uniform over the window and over regions. Each order has a
     # customer id so a deletion request has a subject to reach.
-    order_offsets = rng.integers(0, p.days, size=p.n_orders)
+    order_offsets = order_rng.integers(0, p.days, size=p.n_orders)
     orders = pd.DataFrame({
         "order_id": np.arange(p.n_orders),
         "order_date": start + pd.to_timedelta(order_offsets, unit="D"),
-        "region_id": rng.integers(0, p.n_regions, size=p.n_orders),
-        "customer_id": rng.integers(0, 20_000, size=p.n_orders),
-        "units": rng.integers(1, 12, size=p.n_orders),
+        "region_id": order_rng.integers(0, p.n_regions, size=p.n_orders),
+        "customer_id": order_rng.integers(0, 20_000, size=p.n_orders),
+        "units": order_rng.integers(1, 12, size=p.n_orders),
     })
 
     for df in (cap, asg, orders):
